@@ -1,0 +1,1 @@
+void WriteToFile(int x);
