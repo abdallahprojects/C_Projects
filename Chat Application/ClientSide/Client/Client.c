@@ -1,35 +1,37 @@
+#include "Client.h"
 #include <winsock.h>
 #include <stdio.h>
+
 	 int client;             
   struct sockaddr_in address;
 
 
-void ClientSendData(int number) 
- {
-	sendto(client, (char *)&number, sizeof(number), 0, (struct sockaddr *)&address, sizeof(address)); //(*@\clientBox{1+2)}@*)
- }
+  void SendData(packet_t data)
+   {
+  	sendto(server, (char *)&data, sizeof(data), 0, (struct sockaddr *)&clientAddr, sizeof(clientAddr)); //(*@\clientBox{1+2)}@*)
+   }
+
   
-  
-  int ClientReceiveData(void)
+  packet_t ReceiveData(void)
  {
 	 int addrSize;
 	struct sockaddr_in  clientAddr;
 	int len = sizeof(clientAddr);
-	int data;
+	packet_t data;
 	//struct sockaddr name;
 	memset(&clientAddr, 0, sizeof(clientAddr));
 	clientAddr.sin_family      = AF_INET;          //IPv4 address
 	clientAddr.sin_addr.s_addr = htonl(INADDR_ANY);//don't care network interface
 	getsockname(client,(struct sockaddr *)&clientAddr,&len);
-	printf("source port number %d\n", ntohs(clientAddr.sin_port));	
-	printf("source ip number %s\n", inet_ntoa(clientAddr.sin_addr));	
+	//printf("source port number %d\n", ntohs(clientAddr.sin_port));
+	//printf("source ip number %s\n", inet_ntoa(clientAddr.sin_addr));
 	addrSize                   = sizeof(clientAddr);
 	
 	//WSAStartup(MAKEWORD(2, 0), &wsaData);             //Initialize WinSock
 	//server = socket(PF_INET, SOCK_DGRAM, IPPROTO_UDP);//Allocate UDP socket
 	//bind(server, (struct sockaddr *) &serverAddr, sizeof(serverAddr)); //(*@\serverBox{1)}@*)
 	recvfrom(client, (char *)&data, sizeof(data), 0, (struct sockaddr *) &clientAddr, &addrSize); //(*@\serverBox{2)}@*)	
-	printf("New message %d from server %s\n", data, inet_ntoa(clientAddr.sin_addr));  //(*@\serverBox{3)}@*)
+	//printf("New message %d from server %s\n", data, inet_ntoa(clientAddr.sin_addr));  //(*@\serverBox{3)}@*)
 
 	return data;
  }

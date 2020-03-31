@@ -4,25 +4,22 @@
 	 int server;             
   struct sockaddr_in clientAddr;
   struct sockaddr_in serverAddr;
+  struct sockaddr_in	clientAddr;
 
-struct sockaddr_in	clientAddr;
-void ServerSendData(int number) 
+void SendData(packet_t data)
  {
-	sendto(server, (char *)&number, sizeof(number), 0, (struct sockaddr *)&clientAddr, sizeof(clientAddr)); //(*@\clientBox{1+2)}@*)
+	sendto(server, (char *)&data, sizeof(data), 0, (struct sockaddr *)&clientAddr, sizeof(clientAddr)); //(*@\clientBox{1+2)}@*)
  }
   
   
-  int ServerReceiveData(void)
+  packet_t ReceiveData(void)
  {
 
-	int data;
+	 packet_t data;
 	int addrSize=sizeof(clientAddr);
 	bind(server, (struct sockaddr *) &serverAddr, sizeof(serverAddr)); //(*@\serverBox{1)}@*)
-	
-	// for (j = 5; (--j) >= 0;)   // then receive 1 byte package data and get client address, with flags=0
-		recvfrom(server, (char *)&data, sizeof(data), 0, (struct sockaddr *) &clientAddr, &addrSize); //(*@\serverBox{2)}@*)
-		printf("New message %d from %s\n", data, inet_ntoa(clientAddr.sin_addr));  //(*@\serverBox{3)}@*)	
-		return data;
+	recvfrom(server, (char *)&data, sizeof(data), 0, (struct sockaddr *) &clientAddr, &addrSize); //(*@\serverBox{2)}@*)
+	return data;
  }
  
  
