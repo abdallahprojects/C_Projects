@@ -5,14 +5,14 @@
 #include <stdlib.h>
 
 static void sender(void);
-static void receiver(void);
+DWORD WINAPI receiver(LPVOID Param);
 void ReadMyName(void);
 void SendConnectRequest(void);
 
 char username[50];
 static char myname[50];
 int main ()
-{	int x=0;
+{	
 	HANDLE ThreadHandle;
 	DWORD ThreadId;
 	ClientInit(9998 ,"127.0.0.1");
@@ -28,7 +28,7 @@ return 0;
 }	
 
 
-static void receiver(void)
+DWORD WINAPI receiver(LPVOID Param)
 {
 	packet_t x;
 	while(1)
@@ -66,13 +66,14 @@ static void sender(void)
 		{
 			scanf("%c",&text[i]);
 			i++;
-		}while((i<=200)||(text[--i]!="\n"));
-
-		if (!strcmp(text,"quit\n") || !strcmp(text,"QUIT\n"))
-				{	printf("Exiting Application and Terminating receiver thread!")
+		}while((i<=200)&&(text[i-1]!='\n'));
+		text[i-1] = 0;
+		if (!strcmp(text,"quit") || !strcmp(text,"QUIT"))
+				{	
+					printf("Exiting Application and Terminating receiver thread!");
 					break;
 				}
-		memcpy(data.data,text,i-1);
+		memcpy(data.data,text,i);
 		data.type = type_text;
 		SendData(data);
 	}
@@ -87,13 +88,14 @@ void ReadMyName(void)
 	{
 		scanf("%c",&myname[i]);
 		i++;
-	}while((i<=50)||(myname[--i]!="\n"));
+	}while((i<=50)&&(myname[i-1]!='\n'));
+	i--;
 	myname[i]=0;
 }
 void SendConnectRequest(void)
 {
 	packet_t x;
-	memset(x,0,sizeof(x));
+	memset(&x,0,sizeof(x));
 	x.type=type_connect;
 	memcpy(x.data,myname,strlen(myname));
 	SendData(x);

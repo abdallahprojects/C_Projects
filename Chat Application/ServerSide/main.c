@@ -4,7 +4,7 @@
 #include <string.h>
 #include <stdlib.h>
 static void sender(void);
-DWORD WINAPI receiver(void);
+DWORD WINAPI receiver(LPVOID Param);
 void ReadMyName(void);
 char username[50];
 char myname[50];
@@ -24,7 +24,7 @@ int main ()
 return 0;
 }	
 
-DWORD WINAPI receiver(void)
+DWORD WINAPI receiver(LPVOID Param)
 {
 	packet_t x;
 	while(1)
@@ -67,13 +67,13 @@ static void sender(void)
 		{
 			scanf("%c",&text[i]);
 			i++;
-		}while((i<200)||(text[i-1]!='\n'));
-		i--;
-		if ((!strcmp(text,"quit\n")) || (!strcmp(text,"QUIT\n")))
+		}while((i<200)&&(text[i-1]!='\n'));
+		text[i-1] = 0;
+		if ((!strcmp(text,"quit")) || (!strcmp(text,"QUIT")))
 				{	printf("Exiting Application and Terminating receiver thread!");
 					break;
 				}
-		memcpy(data.data,text,i-1);
+		memcpy(data.data,text,i);
 		data.type = type_text;
 		SendData(data);
 	}
@@ -85,11 +85,12 @@ void ReadMyName(void)
 	int i=0;
 
 	do
-	{	printf("debugging test\n");
+	{
 		scanf("%c",&myname[i]);
 		i++;
-	}while((i<50)||(myname[i-1]!='\n'));
+	}while((i<50)&&(myname[i-1]!='\n'));
 	i--;
-	printf("MYNAMEREAD\n");
 	myname[i]=0;
+	printf("Hello %s!\n",myname);
+
 }
