@@ -8,15 +8,18 @@ static void sender(void);
 DWORD WINAPI receiver(LPVOID Param);
 void ReadMyName(void);
 void SendConnectRequest(void);
+void GetFileName(char filePath[400]);
 static int mynameFlag = 1;
-
-char username[50];
+static char filePath[400];
+static char username[50];
 static char myname[50];
+static char extension[10];
+static char fileName[50];
 int main ()
 {	
 	HANDLE ThreadHandle;
 	DWORD ThreadId;
-	ClientInit(9998 ,"127.0.0.1");
+	ClientInit(9998 ,"68.54.10.8");
 	ReadMyName();
 	ThreadHandle = CreateThread( NULL, /* default security attributes */ 0, /* default stack size */
 	  receiver, /* thread function */ NULL, /* parameter to thread function */ 0, /* default creation    flags */ &ThreadId);
@@ -64,6 +67,7 @@ static void sender(void)
 	while(1)
 	{
 		i=0;
+		int j=0;
 
 		do
 		{
@@ -76,9 +80,29 @@ static void sender(void)
 					printf("Exiting Application and Terminating receiver thread!");
 					break;
 				}
+		else if (!strcmp(text,"file"))
+		{
+			printf("Please Enter The full path to the file:\n");
+			do
+			{
+				scanf("%c",&filePath[j]);
+				j++;
+			}while((j<400) && (filePath[j-1]!='\n'));
+
+			j--;
+			filePath[j]=0;
+			//Sending file transmit request
+			data.type=type_fileSendRequest;
+			GetFileName(filePath);
+			printf("Sending \"%s%s\"\n",fileName,extension);
+
+		}
+		else
+		{
 		memcpy(data.data,text,i);
 		data.type = type_text;
 		SendData(data);
+		}
 	}
 }
 
@@ -108,5 +132,53 @@ void SendConnectRequest(void)
 		Sleep(200);
 	}
 
+
+}
+
+
+void GetFileName(char filePath[400])
+{
+	int i=0;
+	int len=0;
+	char ch;
+
+	len=strlen(filePath);
+	memset(extension,0,sizeof(extension));
+	do
+	{
+		ch=filePath[len--];
+
+	if(ch != '"' && ch != '\'' && ch!=0)
+		{
+			extension[i++]=ch;
+		}
+
+	}while((ch!='.') && (i<10) );
+
+	if (ch != '.')
+	{
+		printf("Wrong File Extension\n");
+		return;
+	}
+//extracting fileName
+	i=0;
+	memset(fileName,0,sizeof(fileName));
+	do
+	{
+		ch=filePath[len--];
+		fileName[i++]=ch;
+
+	}while((ch!='\\') && (i<50) );
+	fileName[i-1]=0;
+
+	if (ch != '\\')
+	{
+		printf("too long File Name\n");
+		return;
+	}
+
+
+	memcpy(extension,strrev(extension),sizeof(extension));
+	memcpy(fileName,strrev(fileName),sizeof(fileName));
 
 }
