@@ -8,6 +8,7 @@ static void sender(void);
 DWORD WINAPI receiver(LPVOID Param);
 void ReadMyName(void);
 void SendConnectRequest(void);
+static int mynameFlag = 1;
 
 char username[50];
 static char myname[50];
@@ -17,9 +18,9 @@ int main ()
 	DWORD ThreadId;
 	ClientInit(9998 ,"127.0.0.1");
 	ReadMyName();
-	SendConnectRequest();
 	ThreadHandle = CreateThread( NULL, /* default security attributes */ 0, /* default stack size */
 	  receiver, /* thread function */ NULL, /* parameter to thread function */ 0, /* default creation    flags */ &ThreadId);
+	SendConnectRequest();
 	sender();
 	TerminateThread(ThreadHandle,0);
 	CloseSocket();
@@ -38,6 +39,8 @@ DWORD WINAPI receiver(LPVOID Param)
 		{
 			memcpy(username,x.data,strlen(x.data));
 			printf("%s is connected, Say Hi!\n",username);
+			mynameFlag = 0;
+
 		}
 		else if (x.type == type_text)
 		{
@@ -81,14 +84,14 @@ static void sender(void)
 
 void ReadMyName(void)
 {
-	printf("Please Enter your name:\n");
+	printf("Please Enter your name: ");
 	int i=0;
 
 	do
 	{
 		scanf("%c",&myname[i]);
 		i++;
-	}while((i<=50)&&(myname[i-1]!='\n'));
+	}while((i<50)&&(myname[i-1]!='\n'));
 	i--;
 	myname[i]=0;
 }
@@ -98,5 +101,12 @@ void SendConnectRequest(void)
 	memset(&x,0,sizeof(x));
 	x.type=type_connect;
 	memcpy(x.data,myname,strlen(myname));
-	SendData(x);
+
+	while(mynameFlag) //while I didn't receive server name
+	{
+		SendData(x); // Send my name again
+		Sleep(200);
+	}
+
+
 }

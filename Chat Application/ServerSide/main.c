@@ -32,6 +32,7 @@ DWORD WINAPI receiver(LPVOID Param)
 		x=ReceiveData();
 		if (x.type == type_connect)
 		{
+			memset(username,0,sizeof(username));
 			memcpy(username,x.data,strlen(x.data));
 			printf("%s is connected, Say Hi!\n",username);
 			x.type=type_connect;
