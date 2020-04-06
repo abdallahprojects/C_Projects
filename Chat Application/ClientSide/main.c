@@ -19,7 +19,7 @@ int main ()
 {	
 	HANDLE ThreadHandle;
 	DWORD ThreadId;
-	ClientInit(9998 ,"68.54.10.8");
+	ClientInit(9998 ,"127.0.0.1");
 	ReadMyName();
 	ThreadHandle = CreateThread( NULL, /* default security attributes */ 0, /* default stack size */
 	  receiver, /* thread function */ NULL, /* parameter to thread function */ 0, /* default creation    flags */ &ThreadId);
