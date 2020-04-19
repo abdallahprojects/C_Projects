@@ -1,7 +1,8 @@
 typedef enum type_e{
 		type_text,
 		type_connect,
-		type_disconnect
+		type_disconnect,
+		type_fileSendRequest
 }type_t;
 typedef struct packet_s{
 		type_t type;

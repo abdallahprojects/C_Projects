@@ -3,7 +3,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-
+void strclr (char * ptr, int size);
 static void sender(void);
 DWORD WINAPI receiver(LPVOID Param);
 void ReadMyName(void);
@@ -61,6 +61,7 @@ DWORD WINAPI receiver(LPVOID Param)
 }
 static void sender(void)
 {
+	char FullFileName[50];
 	packet_t data;
 	int i;
 	char text[200];
@@ -95,6 +96,11 @@ static void sender(void)
 			data.type=type_fileSendRequest;
 			GetFileName(filePath);
 			printf("Sending \"%s%s\"\n",fileName,extension);
+			strclr(FullFileName,sizeof(FullFileName));
+			strcpy(FullFileName,fileName);
+			strcat(FullFileName,extension);
+			strcpy(data.data,FullFileName);
+			SendData(data);
 
 		}
 		else
@@ -181,4 +187,12 @@ void GetFileName(char filePath[400])
 	memcpy(extension,strrev(extension),sizeof(extension));
 	memcpy(fileName,strrev(fileName),sizeof(fileName));
 
+}
+
+
+
+void strclr (char * ptr, int size)
+{
+
+	memset(ptr,0,size);
 }

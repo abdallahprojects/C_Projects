@@ -26,7 +26,7 @@ $(target): $(obj) $(hfiles)
 
 
 	
-all: clean $(target) 
+all: $(target) 
 
 .PHONY: run
 run:

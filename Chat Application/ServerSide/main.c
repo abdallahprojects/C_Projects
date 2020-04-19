@@ -48,6 +48,10 @@ DWORD WINAPI receiver(LPVOID Param)
 		{
 			printf("%s disconnected.\n",username);
 		}
+		else if (x.type == type_fileSendRequest)
+		{
+			printf("receiving %s\n",x.data);
+		}
 		else
 		{
 			printf("unexpected protocol..!");
@@ -94,4 +98,4 @@ void ReadMyName(void)
 	myname[i]=0;
 	printf("Hello %s!\n",myname);
 
-}
+} 
