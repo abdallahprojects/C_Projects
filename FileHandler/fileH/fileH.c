@@ -5,6 +5,7 @@
 
 
 FILE * pFile;
+FILE * pFileW;
 uint64_t lSize;
 uint64_t NumberOfChunks;
 uint8_t ChunkSize;
@@ -41,14 +42,36 @@ uint64_t SetChunkSize(uint8_t size) {
 // Return the selected chunk from 1 to NumberOfChunks
 uint64_t GetChunk(uint64_t ChunkNumber,char * Chunk)
 {
+	uint64_t NumberOfBytes;
 	if (ChunkNumber <= NumberOfChunks)
 	{
 		fseek(pFile,ChunkSize*(ChunkNumber-1),SEEK_SET);
 	}
-	fread(Chunk,1,ChunkSize,pFile);
-	return ChunkNumber;
+	NumberOfBytes = fread(Chunk,1,ChunkSize,pFile);
+	return NumberOfBytes;
 }
 void ReadEnd(void){
 
 	 fclose (pFile);
 }
+
+
+bool InitWrite(char *filePath){
+	pFileW = fopen(filePath,"wb+");
+	if(pFileW == NULL){
+		printf("Can't creat the file\n");
+		return false;
+	} else {
+		return true;
+	}
+}
+
+void WriteEnd(void){
+	 fclose (pFileW);
+}
+
+
+void WriteChunk(uint8_t size, char * Chunk){
+	fwrite(Chunk,1,size,pFileW);
+}
+
