@@ -1,8 +1,11 @@
 #include <windows.h>
-#include "Server.h"
+#include <stdint.h>
+#include <stdbool.h>
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include "Server.h"
+#include "fileH.h"
 static void sender(void);
 DWORD WINAPI receiver(LPVOID Param);
 void ReadMyName(void);
@@ -51,10 +54,21 @@ DWORD WINAPI receiver(LPVOID Param)
 		else if (x.type == type_fileSendRequest)
 		{
 			printf("receiving %s\n",x.data);
+			InitWrite(x.data);
+		}
+		else if (x.type == type_fileSendChunk)
+		{
+			WriteChunk(x.ChunkSize,x.data);
+			printf("The chunk size is %d\n",x.ChunkSize);
+			printf("The data is %*.s",x.ChunkSize,x.data);
+		}
+		else if (x.type == type_fileEnd)
+		{
+			WriteEnd();
 		}
 		else
 		{
-			printf("unexpected protocol..!");
+			printf("unexpected protocol..!\n");
 		}
 	}
 }

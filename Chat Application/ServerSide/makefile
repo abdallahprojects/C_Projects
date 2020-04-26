@@ -1,7 +1,7 @@
 target = Server.exe
 src = $(wildcard *.c)\
-		$(wildcard Server/*.c)
-		
+		$(wildcard Server/*.c)\
+		$(wildcard fileH/*.c)
 dirs = $(dir $(src))
 
 hfiles := $(foreach dir,$(dirs),$(wildcard $(dir)/*.h))

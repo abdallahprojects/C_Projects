@@ -1,6 +1,7 @@
 target = Client.exe
 src = $(wildcard *.c)\
-		$(wildcard Client/*.c)
+		$(wildcard Client/*.c)\
+		$(wildcard fileH/*.c)
 		
 dirs = $(dir $(src))
 

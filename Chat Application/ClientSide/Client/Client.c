@@ -1,6 +1,8 @@
+#include <stdint.h>
 #include "Client.h"
 #include <winsock.h>
 #include <stdio.h>
+
 
 	 int serverSocket;             
   struct sockaddr_in ServerAddress;
@@ -53,4 +55,5 @@
  }
  
  
+
 	 

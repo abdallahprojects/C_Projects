@@ -1,3 +1,5 @@
+
+#include <stdint.h>
 #include <winsock.h>
 #include <stdio.h>
 #include "Server.h"
