@@ -48,7 +48,7 @@ uint64_t GetChunk(uint64_t ChunkNumber,char * Chunk)
 		fseek(pFile,ChunkSize*(ChunkNumber-1),SEEK_SET);
 	}
 	NumberOfBytes = fread(Chunk,1,ChunkSize,pFile);
-	printf("The data is %*.s\n",NumberOfBytes,Chunk);
+	//printf("The data is %.*s\n",NumberOfBytes,Chunk);
 	return NumberOfBytes;
 }
 void ReadEnd(void){

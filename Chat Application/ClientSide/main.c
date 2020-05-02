@@ -224,17 +224,20 @@ void SendChunks(uint64_t NumberOfChunks) {
 	packet_t packet;
 	char Chunk[200];
 	uint8_t NumberOfBytes;
-	printf("Number of Chunks = %I64d\n",NumberOfChunks);
+	//printf("Number of Chunks = %I64d\n",NumberOfChunks);
 	for (i = 1; i <= NumberOfChunks; i++) {
 		NumberOfBytes = GetChunk(i, Chunk);
 		packet.type=type_fileSendChunk;
 		packet.ChunkSize=NumberOfBytes;
 		packet.ChunkNumber=i;
-		memcpy(packet.data,Chunk,sizeof(NumberOfBytes));
-		printf("The data is %*.s\n",NumberOfBytes,Chunk);
+		memcpy(packet.data,Chunk,(NumberOfBytes));
+		//printf("The data is %.*s\n",NumberOfBytes,Chunk);
 		SendData(packet);
-		printf("Sending Chunk Number %d\n",i);
+		//printf("Sending Chunk Number %d\n",i);
+		printf("\r%d%%",(i*100)/NumberOfChunks);
+
 	}
 	packet.type = type_fileEnd;
 	SendData(packet);
+	printf("\nFile sent!\n");
 }

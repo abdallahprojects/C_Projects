@@ -59,12 +59,13 @@ DWORD WINAPI receiver(LPVOID Param)
 		else if (x.type == type_fileSendChunk)
 		{
 			WriteChunk(x.ChunkSize,x.data);
-			printf("The chunk size is %d\n",x.ChunkSize);
-			printf("The data is %*.s",x.ChunkSize,x.data);
+			//printf("The chunk size is %d\n",x.ChunkSize);
+			//printf("The data is %.*s",x.ChunkSize,x.data);
 		}
 		else if (x.type == type_fileEnd)
 		{
 			WriteEnd();
+			printf("File received!\n");
 		}
 		else
 		{
