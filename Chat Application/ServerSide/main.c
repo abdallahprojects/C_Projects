@@ -15,8 +15,9 @@ int main ()
 {
 	HANDLE ThreadHandle;
 	DWORD ThreadId;
-	ServerInit(9998);
 	ReadMyName();
+	ServerInit(9998);
+
 	ThreadHandle = CreateThread( NULL, /* default security attributes */ 0, /* default stack size */
 	  receiver, /* thread function */ NULL, /* parameter to thread function */ 0, /* default creation    flags */ &ThreadId);
 	sender();
@@ -26,13 +27,13 @@ int main ()
 
 return 0;
 }	
-
+packet_t x;
 DWORD WINAPI receiver(LPVOID Param)
 {
-	packet_t x;
+
 	while(1)
 	{
-		x=ReceiveData();
+		ReceiveData(&x);
 		if (x.type == type_connect)
 		{
 			memset(username,0,sizeof(username));
