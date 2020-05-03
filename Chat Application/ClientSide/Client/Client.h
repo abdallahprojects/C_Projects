@@ -16,7 +16,7 @@ typedef struct packet_s{
 		uint8_t 	ChunkSize;
 }packet_t;
 
-void SendData(packet_t data);
+void SendData(packet_t * data);
 packet_t ReceiveData(void);
 void ClientInit(int PortNumber , char *ip);
 void CloseSocket(void);

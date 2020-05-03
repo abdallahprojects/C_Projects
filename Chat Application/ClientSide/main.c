@@ -4,6 +4,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <stdbool.h>
+#include <time.h>
 #include "fileH.h"
 #include "Client.h"
 typedef enum FileState_e{
@@ -31,8 +32,8 @@ char FullFileName[50];
 int main() {
 	HANDLE ThreadHandle;
 	DWORD ThreadId;
-	ClientInit(9998, "127.0.0.1");
 	ReadMyName();
+	ClientInit(9998, "127.0.0.1");
 	ThreadHandle = CreateThread( NULL, /* default security attributes */0, /* default stack size */
 	receiver, /* thread function */NULL, /* parameter to thread function */0, /* default creation    flags */
 			&ThreadId);
@@ -68,8 +69,8 @@ static void sender(void) {
 	char text[200];
 	while (1) {
 		i = 0;
-
-		do {
+		memset(text,0,200);
+	do {
 			scanf("%c", &text[i]);
 			i++;
 		} while ((i <= 200) && (text[i - 1] != '\n'));
@@ -80,9 +81,10 @@ static void sender(void) {
 		} else if (!strcmp(text, "file")) {
 		while (	FileStateMachine());
 		} else {
+			memset(&data,0,sizeof(data));
 			memcpy(data.data, text, i);
 			data.type = type_text;
-			SendData(data);
+			SendData(&data);
 		}
 	}
 }
@@ -106,7 +108,7 @@ void SendConnectRequest(void) {
 
 	while (mynameFlag) //while I didn't receive server name
 	{
-		SendData(x); // Send my name again
+		SendData(&x); // Send my name again
 		Sleep(200);
 	}
 
@@ -215,7 +217,7 @@ bool SendFileRequest(void) {
 	strcpy(FullFileName, fileName);
 	strcat(FullFileName, extension);
 	strcpy(data.data, FullFileName);
-	SendData(data);
+	SendData(&data);
 	return ret;
 }
 
@@ -223,21 +225,24 @@ void SendChunks(uint64_t NumberOfChunks) {
 	int i;
 	packet_t packet;
 	char Chunk[200];
+	memset(Chunk,0,200);
 	uint8_t NumberOfBytes;
 	//printf("Number of Chunks = %I64d\n",NumberOfChunks);
 	for (i = 1; i <= NumberOfChunks; i++) {
 		NumberOfBytes = GetChunk(i, Chunk);
+		memset(&packet,0,sizeof(packet_t));
 		packet.type=type_fileSendChunk;
 		packet.ChunkSize=NumberOfBytes;
 		packet.ChunkNumber=i;
 		memcpy(packet.data,Chunk,(NumberOfBytes));
 		//printf("The data is %.*s\n",NumberOfBytes,Chunk);
-		SendData(packet);
+		SendData(&packet);
+		Sleep(20);
 		//printf("Sending Chunk Number %d\n",i);
-		printf("\r%d%%",(i*100)/NumberOfChunks);
+		printf("\r%I64d%%",(i*100)/NumberOfChunks);
 
 	}
 	packet.type = type_fileEnd;
-	SendData(packet);
+	SendData(&packet);
 	printf("\nFile sent!\n");
 }
