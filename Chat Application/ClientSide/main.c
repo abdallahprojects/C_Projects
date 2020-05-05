@@ -18,7 +18,7 @@ static void sender(void);
 DWORD WINAPI receiver(LPVOID Param);
 void ReadMyName(void);
 void SendConnectRequest(void);
-void GetFileName(char filePath[400]);
+void GetFileName(char filePath[400],uint32_t size);
 bool FileStateMachine(void);
 bool SendFileRequest(void);
 void SendChunks(uint64_t NumberOfChunks);
@@ -113,8 +113,8 @@ void SendConnectRequest(void) {
 	}
 
 }
-
-void GetFileName(char filePath[400]) {
+//C:\hello.tx
+void GetFileName(char filePath[400],uint32_t size) {
 	int i = 0;
 	int len = 0;
 	char ch;
@@ -128,10 +128,14 @@ void GetFileName(char filePath[400]) {
 			extension[i++] = ch;
 		}
 
-	} while ((ch != '.') && (i < 10));
+	} while ((ch != '\\') && (ch != '.') && (i < 10) && (len!=-1));
 
-	if (ch != '.') {
-		printf("Wrong File Extension\n");
+	if ((ch != '.') || (len == 0)) {
+		//printf("No File Extension\n");
+		// no file extension
+		extension[i]=0;
+		strcpy(fileName,strrev(extension));
+		memset(extension,0,sizeof(extension));
 		return;
 	}
 //extracting fileName
@@ -141,14 +145,13 @@ void GetFileName(char filePath[400]) {
 		ch = filePath[len--];
 		fileName[i++] = ch;
 
-	} while ((ch != '\\') && (i < 50));
+	} while (((ch != '\\')&&(ch!=0)) && (i < 50));
 	fileName[i - 1] = 0;
 
-	if (ch != '\\') {
+	if  (i>=50) {
 		printf("too long File Name\n");
 		return;
 	}
-
 	memcpy(extension, strrev(extension), sizeof(extension));
 	memcpy(fileName, strrev(fileName), sizeof(fileName));
 
@@ -198,17 +201,22 @@ bool SendFileRequest(void) {
 	packet_t data;
 	int j=0;
 	bool ret;
+	char buff = 0;
 	printf("Please Enter The full path to the file:\n");
 	do {
-		scanf("%c", &filePath[j]);
-		j++;
+		scanf("%c", &buff);
+		if((buff != '"') && buff != '\'')
+		{
+			filePath[j]=buff;
+			j++;
+		}
 	} while ((j < 400) && (filePath[j - 1] != '\n'));
 
 	j--;
 	filePath[j] = 0;
 	//Sending file transmit request
 	data.type = type_fileSendRequest;
-	GetFileName(filePath);
+	GetFileName(filePath,j);
 	printf("Sending \"%s%s\"\n", fileName, extension);
 //	printf("%s",filePath);
 	ret = InitRead(filePath);
@@ -237,7 +245,6 @@ void SendChunks(uint64_t NumberOfChunks) {
 		memcpy(packet.data,Chunk,(NumberOfBytes));
 		//printf("The data is %.*s\n",NumberOfBytes,Chunk);
 		SendData(&packet);
-		Sleep(20);
 		//printf("Sending Chunk Number %d\n",i);
 		printf("\r%I64d%%",(i*100)/NumberOfChunks);
 

@@ -22,7 +22,7 @@
 	struct sockaddr_in  clientAddr;
 	int len = sizeof(clientAddr);*/
 	static packet_t data;
-
+	int error;
 	memset(&data,0,sizeof(data));
 	/*//struct sockaddr name;
 	memset(&clientAddr, 0, sizeof(clientAddr));
@@ -31,7 +31,12 @@
 	getsockname(serverSocket,(struct sockaddr *)&clientAddr,&len);
 	addrSize                   = sizeof(clientAddr);
 	recvfrom(serverSocket, (char *)&data, sizeof(data), 0, (struct sockaddr *) &clientAddr, &addrSize); //(*@\serverBox{2)}@*)	*/
-	 recv(serverSocket, (char *)&data, sizeof(data),0);
+	 error = recv(serverSocket, (char *)&data, sizeof(data),0);
+	if(error == SOCKET_ERROR){
+		printf("\nServer connection error");
+		exit(0);
+	 }
+
 	return data;
  }
  
@@ -46,7 +51,7 @@
   ServerAddress.sin_addr.s_addr = inet_addr(ip);//Set to (loopback) IP address
   ServerAddress.sin_port        = htons(PortNumber); //Make port in network byte order
   serverSocket = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP); //Allocate server socket
-  connect(serverSocket,(struct sockaddr *)&ServerAddress,sizeof(ServerAddress));
+  while(connect(serverSocket,(struct sockaddr *)&ServerAddress,sizeof(ServerAddress)));
 
  }
  
