@@ -1,6 +1,7 @@
+#gcc = C:\MinGW\bin\gcc.exe
 target = Server.exe
 src = $(wildcard *.c)\
-		$(wildcard Server/*.c)\
+		$(wildcard NET/*.c)\
 		$(wildcard fileH/*.c)
 dirs = $(dir $(src))
 
@@ -11,8 +12,12 @@ inc = $(foreach dir,$(dirs),$(addprefix -I,$(dir)))
 obj = $(src:.c=.o)
 
 cflags  = -Wall -lwsock32
-
-$(target): $(obj) $(hfiles)
+version:
+	make --version
+gcc_version:
+	gcc --version
+	
+$(target): $(obj) 
 	@echo
 	@echo 	'****************** Linking ******************'
 	gcc  $^  $(cflags) -o $@
@@ -26,7 +31,7 @@ $(target): $(obj) $(hfiles)
 
 
 	
-all: clean $(target) 
+all: clean gcc_version version $(target) 
 
 .PHONY: run
 run:

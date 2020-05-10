@@ -8,15 +8,14 @@ typedef enum type_e{
 		type_fileSendRequest_Ok,
 		type_fileEnd
 }type_t;
-
 typedef struct packet_s{
 		type_t 		type;
 		char 		data [200];
 		uint64_t 	ChunkNumber;
 		uint8_t 	ChunkSize;
 }packet_t;
-
-void SendData(packet_t * data);
-packet_t ReceiveData(void);
-void ClientInit(int PortNumber , char *ip);
-void CloseSocket(void);
+void NET_SendData(packet_t * data);
+void NET_ReceiveData(packet_t * data);
+void NET_ServerInit(int PortNumber);
+void NET_ClientInit(int PortNumber , char *ip);
+void NET_CloseSocket(void);

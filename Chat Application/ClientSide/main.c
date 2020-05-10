@@ -6,7 +6,7 @@
 #include <stdbool.h>
 #include <time.h>
 #include "fileH.h"
-#include "Client.h"
+#include "NET.h"
 typedef enum FileState_e{
 		file_Init,
 		file_ReadNumberOfChunks,
@@ -33,14 +33,14 @@ int main() {
 	HANDLE ThreadHandle;
 	DWORD ThreadId;
 	ReadMyName();
-	ClientInit(9998, "127.0.0.1");
+	NET_ClientInit(9998, "68.54.10.8");
 	ThreadHandle = CreateThread( NULL, /* default security attributes */0, /* default stack size */
 	receiver, /* thread function */NULL, /* parameter to thread function */0, /* default creation    flags */
 			&ThreadId);
 	SendConnectRequest();
 	sender();
 	TerminateThread(ThreadHandle, 0);
-	CloseSocket();
+	NET_CloseSocket();
 
 	return 0;
 }
@@ -48,7 +48,7 @@ int main() {
 DWORD WINAPI receiver(LPVOID Param) {
 	packet_t x;
 	while (1) {
-		x = ReceiveData();
+		NET_ReceiveData(&x);
 		if (x.type == type_connect) {
 			memcpy(username, x.data, strlen(x.data));
 			printf("%s is connected, Say Hi!\n", username);
@@ -84,7 +84,7 @@ static void sender(void) {
 			memset(&data,0,sizeof(data));
 			memcpy(data.data, text, i);
 			data.type = type_text;
-			SendData(&data);
+			NET_SendData(&data);
 		}
 	}
 }
@@ -108,7 +108,7 @@ void SendConnectRequest(void) {
 
 	while (mynameFlag) //while I didn't receive server name
 	{
-		SendData(&x); // Send my name again
+		NET_SendData(&x); // Send my name again
 		Sleep(200);
 	}
 
@@ -225,7 +225,7 @@ bool SendFileRequest(void) {
 	strcpy(FullFileName, fileName);
 	strcat(FullFileName, extension);
 	strcpy(data.data, FullFileName);
-	SendData(&data);
+	NET_SendData(&data);
 	return ret;
 }
 
@@ -244,12 +244,12 @@ void SendChunks(uint64_t NumberOfChunks) {
 		packet.ChunkNumber=i;
 		memcpy(packet.data,Chunk,(NumberOfBytes));
 		//printf("The data is %.*s\n",NumberOfBytes,Chunk);
-		SendData(&packet);
+		NET_SendData(&packet);
 		//printf("Sending Chunk Number %d\n",i);
 		printf("\r%I64d%%",(i*100)/NumberOfChunks);
 
 	}
 	packet.type = type_fileEnd;
-	SendData(&packet);
+	NET_SendData(&packet);
 	printf("\nFile sent!\n");
 }

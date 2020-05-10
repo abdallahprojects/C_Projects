@@ -14,7 +14,8 @@ typedef struct packet_s{
 		uint64_t 	ChunkNumber;
 		uint8_t 	ChunkSize;
 }packet_t;
-void SendData(packet_t data);
-void ReceiveData(packet_t * data);
-void ServerInit(int PortNumber);
-void CloseSocket(void);
+void NET_SendData(packet_t * data);
+void NET_ReceiveData(packet_t * data);
+void NET_ServerInit(int PortNumber);
+void NET_ClientInit(int PortNumber , char *ip);
+void NET_CloseSocket(void);

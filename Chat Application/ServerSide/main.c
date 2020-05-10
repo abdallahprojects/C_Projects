@@ -4,8 +4,8 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-#include "Server.h"
 #include "fileH.h"
+#include "NET.h"
 static void sender(void);
 DWORD WINAPI receiver(LPVOID Param);
 void ReadMyName(void);
@@ -16,24 +16,24 @@ int main ()
 	HANDLE ThreadHandle;
 	DWORD ThreadId;
 	ReadMyName();
-	ServerInit(9998);
+	NET_ServerInit(9998);
 
 	ThreadHandle = CreateThread( NULL, /* default security attributes */ 0, /* default stack size */
-	  receiver, /* thread function */ NULL, /* parameter to thread function */ 0, /* default creation    flags */ &ThreadId);
+	receiver, /* thread function */ NULL, /* parameter to thread function */ 0, /* default creation    flags */ &ThreadId);
 	sender();
 	TerminateThread(ThreadHandle,0);
-	CloseSocket();
+	NET_CloseSocket();
 
 
 return 0;
-}	
+}
 packet_t x;
 DWORD WINAPI receiver(LPVOID Param)
 {
 
 	while(1)
 	{
-		ReceiveData(&x);
+		NET_ReceiveData(&x);
 		if (x.type == type_connect)
 		{
 			memset(username,0,sizeof(username));
@@ -42,7 +42,7 @@ DWORD WINAPI receiver(LPVOID Param)
 			x.type=type_connect;
 			memset(x.data,0,200);
 			memcpy(x.data,myname,strlen(myname));
-			SendData(x);
+			NET_SendData(&x);
 		}
 		else if (x.type == type_text)
 		{
@@ -96,7 +96,7 @@ static void sender(void)
 				}
 		memcpy(data.data,text,i);
 		data.type = type_text;
-		SendData(data);
+		NET_SendData(&data);
 	}
 }
 
@@ -114,4 +114,4 @@ void ReadMyName(void)
 	myname[i]=0;
 	printf("Hello %s!\n",myname);
 
-} 
+}

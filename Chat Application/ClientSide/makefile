@@ -1,6 +1,6 @@
 target = Client.exe
 src = $(wildcard *.c)\
-		$(wildcard Client/*.c)\
+		$(wildcard NET/*.c)\
 		$(wildcard fileH/*.c)
 		
 dirs = $(dir $(src))
@@ -13,7 +13,7 @@ obj = $(src:.c=.o)
 
 cflags  = -Wall -lwsock32
 
-$(target): $(obj) $(hfiles)
+$(target): $(obj)
 	@echo
 	@echo 	'****************** Linking ******************'
 	gcc  $^  $(cflags) -o $@
