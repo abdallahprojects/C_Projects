@@ -37,7 +37,7 @@ void SendData(packet_t data)
 		//intermediate buffer should be handled
 	}
 	memcpy(data,buff,sizeof(packet_t));
-	memcpy(buff,buff+buff_ptr,sizeof(packet_t));
+	memcpy(buff,buff+sizeof(packet_t),sizeof(packet_t));
 	buff_ptr -= sizeof(packet_t);
 	//printf("type rec is :%d \n",data->type);
 	if(error == SOCKET_ERROR){
