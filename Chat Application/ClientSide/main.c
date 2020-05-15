@@ -33,7 +33,7 @@ int main() {
 	HANDLE ThreadHandle;
 	DWORD ThreadId;
 	ReadMyName();
-	NET_ClientInit(9998, "68.54.10.8");
+	NET_ClientInit(9998, "127.0.0.1");
 	ThreadHandle = CreateThread( NULL, /* default security attributes */0, /* default stack size */
 	receiver, /* thread function */NULL, /* parameter to thread function */0, /* default creation    flags */
 			&ThreadId);
@@ -49,18 +49,27 @@ DWORD WINAPI receiver(LPVOID Param) {
 	packet_t x;
 	while (1) {
 		NET_ReceiveData(&x);
-		if (x.type == type_connect) {
-			memcpy(username, x.data, strlen(x.data));
-			printf("%s is connected, Say Hi!\n", username);
-			mynameFlag = 0;
+		switch (x.type){
 
-		} else if (x.type == type_text) {
-			printf("%s: %s\n", username, x.data);
-		} else if (x.type == type_disconnect) {
-			printf("%s disconnected.\n", username);
-		} else {
-			printf("unexpected protocol..!");
+			case type_connect:
+				memcpy(username, x.data, strlen(x.data));
+				printf("%s is connected, Say Hi!\n", username);
+				mynameFlag = 0;
+				break;
+
+			case type_text:
+				printf("%s: %s\n", username, x.data);
+				break;
+
+			case  type_disconnect:
+				printf("%s disconnected.\n", username);
+				break;
+
+			default:
+				printf("unexpected protocol..!");
+
 		}
+
 	}
 }
 static void sender(void) {

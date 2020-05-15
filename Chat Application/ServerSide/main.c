@@ -71,7 +71,6 @@ DWORD WINAPI receiver(LPVOID Param)
 				
 			default:
 				printf("unexpected protocol..!\n");
-				break;
 		}	
 		
 	}
