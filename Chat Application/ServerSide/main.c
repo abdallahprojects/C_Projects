@@ -34,44 +34,46 @@ DWORD WINAPI receiver(LPVOID Param)
 	while(1)
 	{
 		NET_ReceiveData(&x);
-		if (x.type == type_connect)
-		{
-			memset(username,0,sizeof(username));
-			memcpy(username,x.data,strlen(x.data));
-			printf("%s is connected, Say Hi!\n",username);
-			x.type=type_connect;
-			memset(x.data,0,200);
-			memcpy(x.data,myname,strlen(myname));
-			NET_SendData(&x);
-		}
-		else if (x.type == type_text)
-		{
-			printf("%s: %s\n",username,x.data);
-		}
-		else if (x.type == type_disconnect)
-		{
-			printf("%s disconnected.\n",username);
-		}
-		else if (x.type == type_fileSendRequest)
-		{
-			printf("receiving %s\n",x.data);
-			InitWrite(x.data);
-		}
-		else if (x.type == type_fileSendChunk)
-		{
-			WriteChunk(x.ChunkSize,x.data);
-			//printf("The chunk size is %d\n",x.ChunkSize);
-			//printf("The data is %.*s",x.ChunkSize,x.data);
-		}
-		else if (x.type == type_fileEnd)
-		{
-			WriteEnd();
-			printf("File received!\n");
-		}
-		else
-		{
-			printf("unexpected protocol..!\n");
-		}
+		
+		switch (x.type){
+		
+			case type_connect:			
+				memset(username,0,sizeof(username));
+				memcpy(username,x.data,strlen(x.data));
+				printf("%s is connected, Say Hi!\n",username);
+				x.type=type_connect;
+				memset(x.data,0,200);
+				memcpy(x.data,myname,strlen(myname));
+				NET_SendData(&x);
+				break;
+				
+			case type_text:
+				printf("%s: %s\n",username,x.data);
+				break;
+				
+			case type_disconnect:
+				printf("%s disconnected.\n",username);
+				break;
+				
+			case type_fileSendRequest:
+				printf("receiving %s\n",x.data);
+				InitWrite(x.data);	
+				break;
+				
+			case type_fileSendChunk:
+				WriteChunk(x.ChunkSize,x.data);
+				break;
+				
+			case type_fileEnd:
+				WriteEnd();
+				printf("File received!\n");			
+				break;
+				
+			default:
+				printf("unexpected protocol..!\n");
+				break;
+		}	
+		
 	}
 }
 
