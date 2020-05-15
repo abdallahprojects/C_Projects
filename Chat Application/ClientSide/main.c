@@ -1,3 +1,4 @@
+#define MAIN_C_
 #include <windows.h>
 #include <stdint.h>
 #include <stdio.h>
@@ -7,28 +8,9 @@
 #include <time.h>
 #include "fileH.h"
 #include "NET.h"
-typedef enum FileState_e{
-		file_Init,
-		file_ReadNumberOfChunks,
-		file_SendChunks,
-		file_End
-}FileState_t;
-void strclr(char * ptr, int size);
-static void sender(void);
-DWORD WINAPI receiver(LPVOID Param);
-void ReadMyName(void);
-void SendConnectRequest(void);
-void GetFileName(char filePath[400],uint32_t size);
-bool FileStateMachine(void);
-bool SendFileRequest(void);
-void SendChunks(uint64_t NumberOfChunks);
-static int mynameFlag = 1;
-static char filePath[400];
-static char username[50];
-static char myname[50];
-static char extension[10];
-static char fileName[50];
-char FullFileName[50];
+#include "main.h"
+#include "main_local.h"
+
 int main() {
 	HANDLE ThreadHandle;
 	DWORD ThreadId;
@@ -36,7 +18,7 @@ int main() {
 	NET_ClientInit(9998, "127.0.0.1");
 	ThreadHandle = CreateThread( NULL, /* default security attributes */0, /* default stack size */
 	receiver, /* thread function */NULL, /* parameter to thread function */0, /* default creation    flags */
-			&ThreadId);
+	&ThreadId);
 	SendConnectRequest();
 	sender();
 	TerminateThread(ThreadHandle, 0);
@@ -49,24 +31,24 @@ DWORD WINAPI receiver(LPVOID Param) {
 	packet_t x;
 	while (1) {
 		NET_ReceiveData(&x);
-		switch (x.type){
+		switch (x.type) {
 
-			case type_connect:
-				memcpy(username, x.data, strlen(x.data));
-				printf("%s is connected, Say Hi!\n", username);
-				mynameFlag = 0;
-				break;
+		case type_connect:
+			memcpy(username, x.data, strlen(x.data));
+			printf("%s is connected, Say Hi!\n", username);
+			mynameFlag = 0;
+			break;
 
-			case type_text:
-				printf("%s: %s\n", username, x.data);
-				break;
+		case type_text:
+			printf("%s: %s\n", username, x.data);
+			break;
 
-			case  type_disconnect:
-				printf("%s disconnected.\n", username);
-				break;
+		case type_disconnect:
+			printf("%s disconnected.\n", username);
+			break;
 
-			default:
-				printf("unexpected protocol..!");
+		default:
+			printf("unexpected protocol..!");
 
 		}
 
@@ -78,8 +60,8 @@ static void sender(void) {
 	char text[200];
 	while (1) {
 		i = 0;
-		memset(text,0,200);
-	do {
+		memset(text, 0, 200);
+		do {
 			scanf("%c", &text[i]);
 			i++;
 		} while ((i <= 200) && (text[i - 1] != '\n'));
@@ -88,9 +70,10 @@ static void sender(void) {
 			printf("Exiting Application and Terminating receiver thread!");
 			break;
 		} else if (!strcmp(text, "file")) {
-		while (	FileStateMachine());
+			while (FileStateMachine())
+				;
 		} else {
-			memset(&data,0,sizeof(data));
+			memset(&data, 0, sizeof(data));
 			memcpy(data.data, text, i);
 			data.type = type_text;
 			NET_SendData(&data);
@@ -123,7 +106,7 @@ void SendConnectRequest(void) {
 
 }
 //C:\hello.tx
-void GetFileName(char filePath[400],uint32_t size) {
+void GetFileName(char filePath[400], uint32_t size) {
 	int i = 0;
 	int len = 0;
 	char ch;
@@ -137,14 +120,14 @@ void GetFileName(char filePath[400],uint32_t size) {
 			extension[i++] = ch;
 		}
 
-	} while ((ch != '\\') && (ch != '.') && (i < 10) && (len!=-1));
+	} while ((ch != '\\') && (ch != '.') && (i < 10) && (len != -1));
 
 	if ((ch != '.') || (len == 0)) {
 		//printf("No File Extension\n");
 		// no file extension
-		extension[i]=0;
-		strcpy(fileName,strrev(extension));
-		memset(extension,0,sizeof(extension));
+		extension[i] = 0;
+		strcpy(fileName, strrev(extension));
+		memset(extension, 0, sizeof(extension));
 		return;
 	}
 //extracting fileName
@@ -154,10 +137,10 @@ void GetFileName(char filePath[400],uint32_t size) {
 		ch = filePath[len--];
 		fileName[i++] = ch;
 
-	} while (((ch != '\\')&&(ch!=0)) && (i < 50));
+	} while (((ch != '\\') && (ch != 0)) && (i < 50));
 	fileName[i - 1] = 0;
 
-	if  (i>=50) {
+	if (i >= 50) {
 		printf("too long File Name\n");
 		return;
 	}
@@ -172,8 +155,8 @@ void strclr(char * ptr, int size) {
 }
 
 bool FileStateMachine(void) {
-	static uint64_t NumberOfChunks=0;
-	bool ret=true;
+	static uint64_t NumberOfChunks = 0;
+	bool ret = true;
 	static FileState_t state = file_Init;
 	switch (state) {
 
@@ -186,7 +169,7 @@ bool FileStateMachine(void) {
 		break;
 	case file_ReadNumberOfChunks:
 		NumberOfChunks = SetChunkSize(200);
-	//	printf("Number of chunks = %I64d\n",NumberOfChunks);
+		//	printf("Number of chunks = %I64d\n",NumberOfChunks);
 		state = file_SendChunks;
 		break;
 
@@ -197,7 +180,7 @@ bool FileStateMachine(void) {
 		break;
 	case file_End:
 		state = file_Init;
-		NumberOfChunks=0;
+		NumberOfChunks = 0;
 		ReadEnd();
 		ret = false;
 		break;
@@ -208,15 +191,14 @@ bool FileStateMachine(void) {
 bool SendFileRequest(void) {
 
 	packet_t data;
-	int j=0;
+	int j = 0;
 	bool ret;
 	char buff = 0;
 	printf("Please Enter The full path to the file:\n");
 	do {
 		scanf("%c", &buff);
-		if((buff != '"') && buff != '\'')
-		{
-			filePath[j]=buff;
+		if ((buff != '"') && buff != '\'') {
+			filePath[j] = buff;
 			j++;
 		}
 	} while ((j < 400) && (filePath[j - 1] != '\n'));
@@ -225,7 +207,7 @@ bool SendFileRequest(void) {
 	filePath[j] = 0;
 	//Sending file transmit request
 	data.type = type_fileSendRequest;
-	GetFileName(filePath,j);
+	GetFileName(filePath, j);
 	printf("Sending \"%s%s\"\n", fileName, extension);
 //	printf("%s",filePath);
 	ret = InitRead(filePath);
@@ -242,20 +224,20 @@ void SendChunks(uint64_t NumberOfChunks) {
 	int i;
 	packet_t packet;
 	char Chunk[200];
-	memset(Chunk,0,200);
+	memset(Chunk, 0, 200);
 	uint8_t NumberOfBytes;
 	//printf("Number of Chunks = %I64d\n",NumberOfChunks);
 	for (i = 1; i <= NumberOfChunks; i++) {
 		NumberOfBytes = GetChunk(i, Chunk);
-		memset(&packet,0,sizeof(packet_t));
-		packet.type=type_fileSendChunk;
-		packet.ChunkSize=NumberOfBytes;
-		packet.ChunkNumber=i;
-		memcpy(packet.data,Chunk,(NumberOfBytes));
+		memset(&packet, 0, sizeof(packet_t));
+		packet.type = type_fileSendChunk;
+		packet.ChunkSize = NumberOfBytes;
+		packet.ChunkNumber = i;
+		memcpy(packet.data, Chunk, (NumberOfBytes));
 		//printf("The data is %.*s\n",NumberOfBytes,Chunk);
 		NET_SendData(&packet);
 		//printf("Sending Chunk Number %d\n",i);
-		printf("\r%I64d%%",(i*100)/NumberOfChunks);
+		printf("\r%I64d%%", (i * 100) / NumberOfChunks);
 
 	}
 	packet.type = type_fileEnd;
