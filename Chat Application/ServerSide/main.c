@@ -1,3 +1,4 @@
+#define MAIN_C_
 #include <windows.h>
 #include <stdint.h>
 #include <stdbool.h>
@@ -6,11 +7,9 @@
 #include <stdlib.h>
 #include "fileH.h"
 #include "NET.h"
-static void sender(void);
-DWORD WINAPI receiver(LPVOID Param);
-void ReadMyName(void);
-char username[50];
-char myname[50];
+#include "main.h"
+#include "main_local.h"
+
 int main ()
 {
 	HANDLE ThreadHandle;
