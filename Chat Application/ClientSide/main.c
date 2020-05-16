@@ -15,7 +15,7 @@ int main() {
 	HANDLE ThreadHandle;
 	DWORD ThreadId;
 	ReadMyName();
-//	NET_ClientInit(9998, "41.37.88.242");
+//	NET_ClientInit(9998, "197.61.38.80");
 	Menu();
 	ThreadHandle = CreateThread( NULL, /* default security attributes */0, /* default stack size */
 	receiver, /* thread function */NULL, /* parameter to thread function */0, /* default creation    flags */
@@ -280,12 +280,16 @@ void SendChunks(uint64_t NumberOfChunks) {
 	printf("\nFile sent!\n");
 }
 void Menu(void) {
-	int i = 0;
+//	char i;
+	int j=0;
 	char ip[20];
 	printf("*********** Choose whom to connect ***********\n");
 	printf("1-Aser\n2-Abdallah\n3-A specific IP\n");
-	scanf("%d", &i);
-	switch (i) {
+	scanf("%d", &j);
+	//i=getchar();
+	//j = atoi(&i);
+	//j=2;
+	switch (j) {
 	case 1:
 		NET_ClientInit(9998, "68.54.10.8");
 		break;
