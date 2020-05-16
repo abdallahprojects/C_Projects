@@ -120,6 +120,10 @@ void ReadMyName(void) {
 	i--;
 	myname[i] = 0;
 	printf("Hello %s!\n", myname);
+	printf("Your public IP Address is: ");
+	system("wget -qO- http://bot.whatismyipaddress.com");
+	printf("\n");
+
 
 }
 
