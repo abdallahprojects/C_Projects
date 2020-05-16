@@ -6,6 +6,7 @@ typedef enum type_e{
 		type_fileSendChunk_Ok,
 		type_fileSendRequest,
 		type_fileSendRequest_Ok,
+		type_fileSendSize,
 		type_fileEnd
 }type_t;
 typedef struct packet_s{

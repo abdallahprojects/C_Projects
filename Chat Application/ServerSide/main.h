@@ -21,6 +21,7 @@ void SendConnectRequest(void);
 void GetFileName(char filePath[400],uint32_t size);
 bool FileStateMachine(void);
 bool SendFileRequest(void);
+void SendFileSize(uint64_t TotalNumberOfChunks);
 void SendChunks(uint64_t NumberOfChunks);
 
 

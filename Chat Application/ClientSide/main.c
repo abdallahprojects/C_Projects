@@ -28,7 +28,10 @@ int main() {
 }
 
 DWORD WINAPI receiver(LPVOID Param) {
+
 	packet_t x;
+	uint64_t TotalNumberOfChunks;
+
 	while (1) {
 		NET_ReceiveData(&x);
 		switch (x.type) {
@@ -47,8 +50,27 @@ DWORD WINAPI receiver(LPVOID Param) {
 			printf("%s disconnected.\n", username);
 			break;
 
+		case type_fileSendRequest:
+			printf("receiving %s\n", x.data);
+			InitWrite(x.data);
+			break;
+
+		case type_fileSendSize:
+			TotalNumberOfChunks = x.ChunkNumber;
+			break;
+
+		case type_fileSendChunk:
+			WriteChunk(x.ChunkSize, x.data);
+			printf("\r%I64d%%", (x.ChunkNumber * 100) / TotalNumberOfChunks);
+			break;
+
+		case type_fileEnd:
+			WriteEnd();
+			printf("\nFile received!\n");
+			break;
+
 		default:
-			printf("unexpected protocol..!");
+			printf("unexpected protocol..!\n");
 
 		}
 
@@ -91,6 +113,8 @@ void ReadMyName(void) {
 	} while ((i < 50) && (myname[i - 1] != '\n'));
 	i--;
 	myname[i] = 0;
+	printf("Hello %s!\n", myname);
+
 }
 void SendConnectRequest(void) {
 	packet_t x;
@@ -169,6 +193,7 @@ bool FileStateMachine(void) {
 		break;
 	case file_ReadNumberOfChunks:
 		NumberOfChunks = SetChunkSize(200);
+		SendFileSize(NumberOfChunks);
 		//	printf("Number of chunks = %I64d\n",NumberOfChunks);
 		state = file_SendChunks;
 		break;
@@ -218,6 +243,15 @@ bool SendFileRequest(void) {
 	strcpy(data.data, FullFileName);
 	NET_SendData(&data);
 	return ret;
+}
+
+void SendFileSize(uint64_t TotalNumberOfChunks) {
+
+	packet_t packet;
+
+	packet.type = type_fileSendSize;
+	packet.ChunkNumber = TotalNumberOfChunks;
+	NET_SendData(&packet);
 }
 
 void SendChunks(uint64_t NumberOfChunks) {
