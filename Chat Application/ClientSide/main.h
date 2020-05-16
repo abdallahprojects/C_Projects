@@ -24,6 +24,7 @@ bool FileStateMachine(void);
 bool SendFileRequest(void);
 void SendFileSize(uint64_t TotalNumberOfChunks);
 void SendChunks(uint64_t NumberOfChunks);
+void Menu(void);
 
 
 #endif /* MAIN_H_ */
