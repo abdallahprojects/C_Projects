@@ -280,25 +280,24 @@ void SendChunks(uint64_t NumberOfChunks) {
 	printf("\nFile sent!\n");
 }
 void Menu(void) {
-//	char i;
 	int j=0;
 	char ip[20];
 	printf("*********** Choose whom to connect ***********\n");
 	printf("1-Aser\n2-Abdallah\n3-A specific IP\n");
-	scanf("%d", &j);
-	//i=getchar();
-	//j = atoi(&i);
-	//j=2;
+	scanf("%d",&j);  
+	while ((getchar()) != '\n');
+
 	switch (j) {
 	case 1:
 		NET_ClientInit(9998, "68.54.10.8");
 		break;
 	case 2:
-		NET_ClientInit(9998, "197.61.38.80");
+		NET_ClientInit(9998, "197.61.28.244");
 		break;
 	case 3:
 		printf("Enter the IP address of the desired Server: ");
 		scanf("%s", ip);
+		while ((getchar()) != '\n');
 		NET_ClientInit(9998, ip);
 
 	}
